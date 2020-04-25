@@ -27,6 +27,8 @@ export class AppComponent {
   changedContent = false;
   currContent: string;
 
+  @ViewChildren(NgbDropdown) dropdowns: QueryList<NgbDropdown>
+
   @ViewChild('textarea') textarea: ElementRef;
 
   content = new FormControl();
@@ -51,6 +53,18 @@ export class AppComponent {
     }
 
   }
+
+  openIfOtherDropdownIsOpen(dropdown) {
+    let currOpenDropdown = this.dropdowns.find(d => d.isOpen())
+    if (currOpenDropdown) {
+      // let dropdown = this.dropdowns.find(d => (d as any)._elementRef.nativeElement == drop)
+      if(dropdown) {
+        currOpenDropdown.close();
+        dropdown.open();
+      }
+    }
+  }
+
 
   ngOnInit() {
     this.updateTitle();
