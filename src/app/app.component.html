@@ -1,0 +1,24 @@
+<div style="display: flex; flex-flow: column; height: 100%">
+
+  <ul style="flex: 0" ngbNav #nav="ngbNav" class="nav-tabs justify-content-left">
+    <li ngbDropdown #file="ngbDropdown" class="nav-item">
+      <a href (click)="false" class="nav-link" ngbDropdownToggle>File</a>
+      <div ngbDropdownMenu class="dropdown-menu">
+        <button ngbDropdownItem (click)="newFile()">New</button>
+        <button ngbDropdownItem (click)="openFile()">Open...</button>
+        <button ngbDropdownItem (click)="save()">Save</button>
+        <div class="dropdown-divider"></div>
+        <button ngbDropdownItem (click)="saveAs()">Save as...</button>
+      </div>
+    </li>
+    <li ngbDropdown #format="ngbDropdown" class="nav-item">
+      <a href (click)="false" class="nav-link" ngbDropdownToggle>Format</a>
+      <div ngbDropdownMenu class="dropdown-menu">
+        <button ngbDropdownItem>Action</button>
+      </div>
+    </li>
+  </ul>
+
+  <textarea #textarea style="flex: 1; width: 100%; resize: none; overflow: scroll; white-space: pre" [formControl]="content"></textarea>
+
+</div>
