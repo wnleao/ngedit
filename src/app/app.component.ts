@@ -4,6 +4,7 @@ import { Title } from '@angular/platform-browser';
 import { NgbActiveModal, NgbModal, NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
 import { ConfirmModalComponent } from './confirm-modal/confirm-modal.component';
 import { of } from 'rxjs';
+import { FormatModalComponent } from './format-modal/format-modal.component';
 
 // v0
 // https://www.sitepoint.com/build-a-desktop-application-with-electron-and-angular/
@@ -26,6 +27,8 @@ export class AppComponent {
   dialog;
   changedContent = false;
   currContent: string;
+
+  readonly INITIAL_FONT_SIZE = 16;
 
   @ViewChildren(NgbDropdown) dropdowns: QueryList<NgbDropdown>
 
@@ -65,7 +68,6 @@ export class AppComponent {
     }
   }
 
-
   ngOnInit() {
     this.updateTitle();
 
@@ -74,6 +76,10 @@ export class AppComponent {
       this.currContent = value;
       this.updateTitle();
     });
+  }
+
+  ngAfterViewInit() {
+    this.textarea.nativeElement.style.fontSize = this.INITIAL_FONT_SIZE + 'px';
   }
 
   checkIfWantToSaveChanges() {
@@ -217,5 +223,19 @@ export class AppComponent {
     this.path = path;
     this.updateTitle();
   }
+
+  openFormatFont() {
+    let font = this.textarea.nativeElement.style.fontSize;
+    font = font ? font.replace('px', '') : '16';
+
+    let modalRef = this.modalService.open(FormatModalComponent);
+    let modalComp = modalRef.componentInstance as FormatModalComponent;
+    modalComp.fontSize.setValue(font);
+
+    modalComp.size$.subscribe(size => {
+      this.textarea.nativeElement.style.fontSize = size + 'px';
+    });
+  }
+
 
 }

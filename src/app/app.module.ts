@@ -6,11 +6,13 @@ import { AppComponent } from './app.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ConfirmModalComponent } from './confirm-modal/confirm-modal.component';
+import { FormatModalComponent } from './format-modal/format-modal.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ConfirmModalComponent
+    ConfirmModalComponent,
+    FormatModalComponent
   ],
   imports: [
     BrowserModule,

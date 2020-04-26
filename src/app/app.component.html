@@ -1,3 +1,5 @@
+
+
 <div style="display: flex; flex-flow: column; height: 100%">
 
   <ul style="flex: 0" ngbNav #nav="ngbNav" class="nav-tabs justify-content-left">
@@ -14,7 +16,7 @@
     <li ngbDropdown #format="ngbDropdown" class="nav-item" (mouseenter)="openIfOtherDropdownIsOpen(format)">
       <a href (click)="false" class="nav-link" ngbDropdownToggle>Format</a>
       <div ngbDropdownMenu class="dropdown-menu">
-        <button ngbDropdownItem>Action</button>
+        <button ngbDropdownItem (click)="openFormatFont()">Font...</button>
       </div>
     </li>
   </ul>

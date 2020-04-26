@@ -1,0 +1,21 @@
+<div class="modal-header">
+  <h5 class="modal-title">Font</h5>
+  <button type="button" class="close" aria-label="Close" (click)="cancel()">
+      <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+
+  <div><label>Font-size</label></div>
+  <div><input type="number" [formControl]="fontSize" /></div>
+
+  <hr />
+
+  <p>Example: </p>
+  <p [style.font-size.px]="fontSize.value">AbcXyz 1234567890</p>
+
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-outline-dark" (click)="apply()">Apply</button>
+  <button type="button" class="btn btn-outline-dark" (click)="ok()">Ok</button>
+</div>
