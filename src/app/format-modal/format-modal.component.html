@@ -6,13 +6,21 @@
 </div>
 <div class="modal-body">
 
-  <div><label>Font-size</label></div>
+  <div><label>Size:</label></div>
   <div><input type="number" [formControl]="fontSize" /></div>
 
+  <div><label>Family:</label></div>
+  <div>
+    <select [formControl]="fontFamily">
+      <option *ngFor="let family of fontFamilies" value="{{ family }}" [style.font-family]="family">
+        {{ family }}
+      </option>
+    </select>
+  </div>
   <hr />
 
   <p>Example: </p>
-  <p [style.font-size.px]="fontSize.value">AbcXyz 1234567890</p>
+  <p [style.font-size.px]="fontSize.value" [style.font-family]="fontFamily.value">AbcXyz 1234567890</p>
 
 </div>
 <div class="modal-footer">

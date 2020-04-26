@@ -29,6 +29,7 @@ export class AppComponent {
   currContent: string;
 
   readonly INITIAL_FONT_SIZE = 16;
+  readonly INITIAL_FONT_FAMILY = "Arial";
 
   @ViewChildren(NgbDropdown) dropdowns: QueryList<NgbDropdown>
 
@@ -79,7 +80,9 @@ export class AppComponent {
   }
 
   ngAfterViewInit() {
-    this.textarea.nativeElement.style.fontSize = this.INITIAL_FONT_SIZE + 'px';
+    let elemStyle = this.textarea.nativeElement.style;
+    elemStyle.fontSize = this.INITIAL_FONT_SIZE + 'px';
+    elemStyle.fontFamily = this.INITIAL_FONT_FAMILY;
   }
 
   checkIfWantToSaveChanges() {
@@ -225,15 +228,25 @@ export class AppComponent {
   }
 
   openFormatFont() {
-    let font = this.textarea.nativeElement.style.fontSize;
-    font = font ? font.replace('px', '') : '16';
+    let elStyle = this.textarea.nativeElement.style; 
+    let font = elStyle.fontSize;
+    font = font ? font.replace('px', '') : this.INITIAL_FONT_SIZE;
+    
+    let family = elStyle.fontFamily;
+    family = family ? family.replace(/"/g, '') : this.INITIAL_FONT_FAMILY;
+
+    console.log("font family = " + family)
 
     let modalRef = this.modalService.open(FormatModalComponent);
     let modalComp = modalRef.componentInstance as FormatModalComponent;
     modalComp.fontSize.setValue(font);
+    modalComp.fontFamily.setValue(family);
 
     modalComp.size$.subscribe(size => {
       this.textarea.nativeElement.style.fontSize = size + 'px';
+    });
+    modalComp.family$.subscribe(family => {
+      this.textarea.nativeElement.style.fontFamily = family;
     });
   }
 
