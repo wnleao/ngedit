@@ -95,7 +95,7 @@ export class AppComponent {
       return modalRef.result;
     }
 
-    return new Promise((resolve, reject) => resolve(ConfirmEvent.NO));
+    return Promise.resolve(ConfirmEvent.NO);
   }
 
   clear() {
