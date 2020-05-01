@@ -2,7 +2,7 @@ import { Component, ViewChild, ElementRef, HostListener, QueryList, ViewChildren
 import { FormControl } from '@angular/forms';
 import { Title } from '@angular/platform-browser';
 import { NgbActiveModal, NgbModal, NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
-import { ConfirmModalComponent } from './confirm-modal/confirm-modal.component';
+import { ConfirmEvent, ConfirmModalComponent } from './confirm-modal/confirm-modal.component';
 import { of } from 'rxjs';
 import { FormatModalComponent } from './format-modal/format-modal.component';
 
@@ -41,8 +41,7 @@ export class AppComponent {
   constructor(
     private titleService: Title,
     private modalService: NgbModal,
-  ) 
-  {
+  ) {
 
     if ((<any>window).require) {
       try {
@@ -62,7 +61,7 @@ export class AppComponent {
     let currOpenDropdown = this.dropdowns.find(d => d.isOpen())
     if (currOpenDropdown) {
       // let dropdown = this.dropdowns.find(d => (d as any)._elementRef.nativeElement == drop)
-      if(dropdown) {
+      if (dropdown) {
         currOpenDropdown.close();
         dropdown.open();
       }
@@ -89,85 +88,72 @@ export class AppComponent {
     if (this.changedContent) {
       let modalRef = this.modalService.open(ConfirmModalComponent);
       let modalComp = modalRef.componentInstance as ConfirmModalComponent;
-      
-      let tmpPath = this.path ? this.path : 'new file';
-      modalComp.body = `Do you with to save '${tmpPath}'?`;
 
-      return modalComp.result;
+      let tmpPath = this.path ? this.path : 'new file';
+      modalComp.body = `Do you wish to save '${tmpPath}'?`;
+
+      return modalRef.result;
     }
 
-    return of(0);
+    return new Promise((resolve, reject) => resolve(ConfirmEvent.NO));
   }
 
   clear() {
     this.path = "";
     this.changedContent = false;
     this.content.setValue("");
-    this.updateTitle();  
+    this.updateTitle();
+    this.textarea.nativeElement.focus();
   }
 
   // https://alligator.io/angular/binding-keyup-keydown-events/
   @HostListener("window:keydown.control.n")
   newFile() {
-    let result = this.checkIfWantToSaveChanges();
-    result.subscribe(value => {
-      console.log("RESULT = " + value)
-      if(value == 1) {
-        this.save();
-      }
+    // https://javascript.info/promise-chaining
+    this.checkIfWantToSaveChanges()
+      .then(result => { if(result === ConfirmEvent.YES) this.save(); } )
+      .then(() => this.clear())
+      .catch(() => console.log("dismiss new file action!"));
+  }
 
-      if(value != -1) {
-        this.clear();
+  private _openFile() {
+    let options = {
+      title: "Open file",
+      defaultPath: "",
+      buttonLabel: "Open",
+
+      filters: [
+        { name: 'txt', extensions: ['txt',] },
+        { name: 'All Files', extensions: ['*'] }
+      ]
+    }
+
+    // https://www.electronjs.org/docs/api/remote#remotegetcurrentwindow
+    let path = this.dialog.showOpenDialogSync(this.remote.getCurrentWindow(), options);
+    if (path) {
+      console.log(path[0]);
+      // https://nodejs.org/api/fs.html
+      this.efs.readFile(path[0], 'utf-8', (err, data) => {
+        if (err) {
+          alert("Err0r while reading the file:" + err.message);
+          return;
+        }
+
+        console.log("content = " + data);
+        this.currContent = data;
+        this.content.setValue(data);
+        this.setFilePath(path[0]);
         this.textarea.nativeElement.focus();
-      }
-    })
-
-    
+      });
+    }
   }
 
   @HostListener("window:keydown.control.o")
   openFile() {
-
-    let result = this.checkIfWantToSaveChanges();
-    result.subscribe(value => {
-      console.log("RESULT = " + value)
-      if(value == 1) {
-        this.save();
-      }
-
-      if(value != -1) {
-
-        let options = {
-          title: "Open file",
-          defaultPath: "",
-          buttonLabel: "Open",
-    
-          filters: [
-            { name: 'txt', extensions: ['txt',] },
-            { name: 'All Files', extensions: ['*'] }
-          ]
-        }
-
-        // https://www.electronjs.org/docs/api/remote#remotegetcurrentwindow
-        let path = this.dialog.showOpenDialogSync(this.remote.getCurrentWindow(), options);
-        if (path) {
-          console.log(path[0]);
-          // https://nodejs.org/api/fs.html
-          this.efs.readFile(path[0], 'utf-8', (err, data) => {
-            if (err) {
-              alert("Err0r while reading the file:" + err.message);
-              return;
-            }
-     
-            console.log("content = " + data);
-            this.currContent = data;
-            this.content.setValue(data);
-            this.setFilePath(path[0]);
-            this.textarea.nativeElement.focus();
-          });
-        }
-      }
-    });
+    this.checkIfWantToSaveChanges()
+      .then(result => { if(result == ConfirmEvent.YES) this.save(); })
+      .then(() => this._openFile())
+      .catch(() => console.log("dismiss open file action!"));
   }
 
   @HostListener("window:keydown.control.s")
@@ -228,10 +214,10 @@ export class AppComponent {
   }
 
   openFormatFont() {
-    let elStyle = this.textarea.nativeElement.style; 
+    let elStyle = this.textarea.nativeElement.style;
     let font = elStyle.fontSize;
     font = font ? font.replace('px', '') : this.INITIAL_FONT_SIZE;
-    
+
     let family = elStyle.fontFamily;
     family = family ? family.replace(/"/g, '') : this.INITIAL_FONT_FAMILY;
 

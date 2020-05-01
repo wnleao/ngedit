@@ -2,6 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Subject } from 'rxjs';
 
+export enum ConfirmEvent {
+  CANCEL = -1,
+  NO = 0,
+  YES = 1
+}
+
 @Component({
   selector: 'app-confirm-modal',
   templateUrl: './confirm-modal.component.html',
@@ -10,29 +16,25 @@ import { Subject } from 'rxjs';
 export class ConfirmModalComponent implements OnInit {
 
   body: string;
-  result: Subject<number>;
 
-  constructor(public modal: NgbActiveModal) {
-    this.result = new Subject<number>();
+  constructor(
+    private modal: NgbActiveModal
+  ) {
   }
 
   ngOnInit(): void {
-    
   }
 
   cancel() {
-    this.result.next(-1);
-    this.modal.dismiss();
+    this.modal.dismiss(ConfirmEvent.CANCEL);
   }
 
   no() {
-    this.result.next(0);
-    this.modal.close();
+    this.modal.close(ConfirmEvent.NO);
   }
 
   yes() {
-    this.result.next(1);
-    this.modal.close();
+    this.modal.close(ConfirmEvent.YES);
   };
 
 }
